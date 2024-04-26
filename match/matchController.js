@@ -13,7 +13,6 @@ const createMatch = async (req, res) => {
     team_two,
     streaming_source,
   } = req.body;
-  // console.log(req.body);
   if (
     sport_type &&
     league_type &&

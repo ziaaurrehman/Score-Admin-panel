@@ -55,50 +55,52 @@ const matchSchema = mongoose.Schema(
         trim: true,
       },
     },
-    streaming_source: {
-      streaming_title: {
-        type: String,
-        trim: true,
-        required: true,
+    streaming_source: [
+      {
+        streaming_title: {
+          type: String,
+          trim: true,
+          required: true,
+        },
+        is_premium: {
+          type: Boolean,
+          required: true,
+        },
+        resolution: {
+          type: String,
+          trim: true,
+          required: true,
+        },
+        platform: {
+          type: String,
+          trim: true,
+          required: true,
+        },
+        portrait_watermark: {
+          type: Object,
+          required: true,
+        },
+        landscape_watermark: {
+          type: Object,
+          required: true,
+        },
+        status: {
+          type: String,
+          trim: true,
+          required: true,
+        },
+        stream_type: {
+          type: String,
+          trim: true,
+          required: true,
+        },
+        stream_url: {
+          type: String,
+          trim: true,
+          required: true,
+        },
       },
-      is_premium: {
-        type: Boolean,
-        required: true,
-      },
-      resolution: {
-        type: String,
-        trim: true,
-        required: true,
-      },
-      platform: {
-        type: String,
-        trim: true,
-        required: true,
-      },
-      portrait_watermark: {
-        type: Object,
-        required: true,
-      },
-      landscape_watermark: {
-        type: Object,
-        required: true,
-      },
-      status: {
-        type: String,
-        trim: true,
-        required: true,
-      },
-      stream_type: {
-        type: String,
-        trim: true,
-        required: true,
-      },
-      stream_url: {
-        type: String,
-        trim: true,
-        required: true,
-      },
-    },
+    ],
   },
   { timestamps: true }
 );
