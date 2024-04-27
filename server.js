@@ -11,6 +11,10 @@ import { dirname } from "path";
 import newsRoute from "./news/newUpload.js";
 import newsUpdateRoute from "./news/newsupdate.js";
 import newsRouter from "./news/newsRouter.js";
+import appInformationRouter from "./AppInformation/appInformationRoute.js";
+import appInformationCreateRoute from "./AppInformation/appInformationCreateRoute.js";
+import appInformationUpdateRoute from "./AppInformation/appInformationUpdateRoute.js";
+import androidCreateSettingRoute from "./androidSettings/androidCreateSettingsRoute.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,10 +34,22 @@ app.use("/api", matchRouter);
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 app.use("/newsuploads", express.static(path.join(__dirname, "/newsuploads")));
+app.use(
+  "/appInformationupload",
+  express.static(path.join(__dirname, "/appInformationupload"))
+);
+app.use(
+  "/androidSettingUpload",
+  express.static(path.join(__dirname, "/androidSettingUpload"))
+);
 app.use("/api", profileRoute);
 app.use("/api", newsRoute);
 app.use("/api", newsUpdateRoute);
 app.use("/api", newsRouter);
+app.use("/api", appInformationRouter);
+app.use("/api", appInformationCreateRoute);
+app.use("/api", appInformationUpdateRoute);
+app.use("/api", androidCreateSettingRoute);
 
 if (process.env.NODE_ENV === "PRODUCTION") {
   app.use(express.static(path.join(__dirname, "./dist")));
