@@ -1,9 +1,32 @@
-import { Signup, Login } from "./userController.js ";
+import {
+  createNotification,
+  getAllNotifications,
+  deleteNotification,
+  sendNotification,
+} from "./notificationController.js";
 import express from "express";
+import authMiddleware from "../middleware/authMiddleware.js";
 
-const router = express.Router();
+const notificationRouter = express.Router();
 
-router.post("/signup", Signup);
-router.post("/login", Login);
+// Public Route
+notificationRouter.get("/get-all-notifications", getAllNotifications);
 
-export default router;
+// Protected Route
+notificationRouter.post(
+  "/create-notification",
+  authMiddleware,
+  createNotification
+);
+notificationRouter.delete(
+  "/delete-notification/:id",
+  authMiddleware,
+  deleteNotification
+);
+notificationRouter.post(
+  "/send-notification/:id",
+  authMiddleware,
+  sendNotification
+);
+
+export default notificationRouter;

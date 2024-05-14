@@ -13,15 +13,15 @@ const ManageApp = () => {
       img: "https://placehold.jp/300x300.png",
     },
     {
-      title: "Android Settings",
+      title: "Mobile App Settings",
       form: "AndroidSettings",
       img: "https://placehold.jp/300x300.png",
     },
-    {
-      title: "iOS Settings",
-      form: "iOSSettings",
-      img: "https://placehold.jp/300x300.png",
-    },
+    // {
+    //   title: "iOS Settings",
+    //   form: "iOSSettings",
+    //   img: "https://placehold.jp/300x300.png",
+    // },
     {
       title: "Ads Control",
       form: "AdsControl",
@@ -51,9 +51,6 @@ const ManageApp = () => {
                 </div>
               ))}
             </div>
-            <button className="absolute bottom-5 right-20 text-sm px-7 py-3 font-semibold rounded-md shadow-md text-white bg-blue-600 hover:bg-blue-900 transition-colors animate-bounce">
-              Update
-            </button>
           </div>
         </div>
       </Portal>

@@ -1,17 +1,15 @@
 import { useState } from "react";
 import SettingForms from "./SettingForms";
-import { IoLogoAndroid } from "react-icons/io";
+import { MdOutlineAppSettingsAlt } from "react-icons/md";
 import { FaAppStoreIos } from "react-icons/fa";
-import { FaApple } from "react-icons/fa";
+//import { FaApple } from "react-icons/fa";
 import { SiGoogleads } from "react-icons/si";
 import { MdBlock } from "react-icons/md";
 
 const Accordion = ({ title, form }) => {
   const getImgComponent = () => {
-    if (title === "Android Settings") {
-      return <IoLogoAndroid className="h-10 w-10" />;
-    } else if (title === "iOS Settings") {
-      return <FaApple className="h-10 w-10" />;
+    if (title === "Mobile App Settings") {
+      return <MdOutlineAppSettingsAlt className="h-10 w-10" />;
     } else if (title === "App Information") {
       return <FaAppStoreIos className="w-10 h-10" />;
     } else if (title === "Ads Control") {
@@ -27,16 +25,18 @@ const Accordion = ({ title, form }) => {
   return (
     <div className="accordion shadow-sm">
       <div
-        className={`rounded-md flex justify-between items-center p-2 cursor-pointer bg-gray-200 hover:bg-gray-300 hover:rounded-md transition-all`}
+        className={`rounded-md flex justify-between items-center p-2 cursor-pointer bg-gray-200 hover:bg-gray-300 hover:rounded-md transition ${
+          isOpen ? "text-blue-600" : "text-black"
+        }`}
         onClick={toggleContent}
       >
         <div className="flex gap-5 items-center">
           {getImgComponent()}
-          <h2 className="font-bold">{title}</h2>
+          <h2 className="font-semibold mt-1">{title}</h2>
         </div>
         <span
-          className={`text-2xl font-bold icon transition duration-300 ease-in-out transform rotate-0 ${
-            isOpen ? "rotate-180" : ""
+          className={`text-3xl font-bold icon transition duration-300 ease-in-out transform rotate-0 ${
+            isOpen ? "rotate-90" : ""
           }`}
         >
           +

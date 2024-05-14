@@ -2,12 +2,20 @@ import Sidebar from "../Navbar/Sidebar.jsx";
 import { GiHamburgerMenu } from "react-icons/gi";
 import User from "../Navbar/User.jsx";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { CiLogout } from "react-icons/ci";
+import LoadingBar from "react-top-loading-bar";
 
 const Portal = ({ children }) => {
+  const [loading, setLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [user, setUser] = useState({});
   const navigation = useNavigate();
+
+  const handleOpen = () => {
+    setOpen((prevState) => !prevState);
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -20,6 +28,18 @@ const Portal = ({ children }) => {
   useEffect(() => {
     getUser();
   }, []);
+
+  // This displays the loading bar on the top of the screen when a route changes
+  useEffect(() => {
+    setLoading(true);
+    const delay = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => {
+      clearTimeout(delay);
+    };
+  }, [location.pathname]);
 
   const getUser = () => {
     const value = JSON.parse(localStorage.getItem("user"));
@@ -34,6 +54,7 @@ const Portal = ({ children }) => {
     <div className="flex w-full">
       {user ? (
         <>
+          <LoadingBar color="blue" progress={loading ? 100 : 0} height="4px" />
           <div>
             <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
           </div>
@@ -56,7 +77,20 @@ const Portal = ({ children }) => {
                     </p>
                   </div>
                 </div>
-                <User name={"moiz khan"} imgSrc={user.img} />
+                <div className="relative" onClick={handleOpen}>
+                  <User name={"moiz khan"} imgSrc={user.img} />
+                  {open ? (
+                    <Link
+                      className="absolute right-0 p-2 bg-white rounded-md z-10 min-w-[100px] flex gap-2 items-center justify-center font-sm transition hover:text-red-600"
+                      to="/logout"
+                    >
+                      <CiLogout className="text-xl" />
+                      <p>Logout</p>
+                    </Link>
+                  ) : (
+                    ""
+                  )}
+                </div>
               </div>
             </div>
             <div>{children}</div>

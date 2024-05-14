@@ -3,14 +3,89 @@ import { Link, useLocation } from "react-router-dom";
 import Location from "../global/Location";
 import { IoGrid } from "react-icons/io5";
 import { FaList } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Portal from "./Portal";
+import { handleView, fetchMobileView, fetchAllMatches } from "../../Api.js";
+import { toast } from "react-toastify";
+import LoadingBall from "../global/LoadingBall.jsx";
 
 const ManageLive = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [perPage, setPerPage] = useState(10);
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [mobileView, setMobileView] = useState(true);
   const location = useLocation();
   const [isGrid, setIsGrid] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const view = await fetchMobileView();
+        const response = await fetchAllMatches(
+          currentPage,
+          searchQuery,
+          perPage
+        );
+        const { paginatedMatches } = response.data;
+        const extractedMatches = paginatedMatches.map((match) => ({
+          id: match._id,
+          status: match.status,
+          league_type: match.league_type.split("-").join(" "),
+          hot_match: match.hot_match,
+          match_title: match.match_title,
+          match_time: match.match_time,
+          sports_type: match.sport_type,
+          team_one: match.team_one.name,
+          team_one_img: match.team_one.image,
+          team_two: match.team_two.name,
+          team_two_img: match.team_two.image,
+          stream_count: match.streaming_source.length,
+        }));
+        setMatches(extractedMatches);
+        setMobileView(view.data.data);
+      } catch (error) {
+        toast.error("Error fetching matches:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [searchQuery, perPage]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Handle Grid function
   const handleGrid = (gridValue) => {
     setIsGrid(gridValue);
+  };
+
+  // Mobile view
+  const handleViewState = async () => {
+    setMobileView((prevState) => !prevState);
+    try {
+      // Construct the view object using the updated state
+      const view = {
+        mobile_view: !mobileView, // Use !mobileView to reflect the updated state
+      };
+      const res = await handleView(view);
+      if (res) {
+        toast.success("Mobile View Updated!", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    } catch (err) {
+      console.error("Something went wrong");
+    }
   };
 
   return (
@@ -23,7 +98,13 @@ const ManageLive = () => {
               <div className="flex gap-3 items-center">
                 <p className="font-semibold">Show on Mobile</p>
                 <label className="inline-flex items-center cursor-pointer">
-                  <input type="checkbox" value="" className="sr-only peer" />
+                  <input
+                    type="checkbox"
+                    value=""
+                    className="sr-only peer"
+                    checked={mobileView}
+                    onChange={handleViewState}
+                  />
                   <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 </label>
               </div>
@@ -42,6 +123,8 @@ const ManageLive = () => {
               name="search"
               className="p-1 text-sm bg-white rounded-md border-2 border-gray-400 w-[200px] focus:w-[300px] transition-transform"
               placeholder="Search by name or ID"
+              value={searchQuery}
+              onChange={handleSearchChange}
             />
 
             <div className="flex gap-2 items-center p-2">
@@ -59,7 +142,11 @@ const ManageLive = () => {
               </div>
               <div className="flex gap-3">
                 <p className="text-sm">Page Size: </p>
-                <select className="bg-white rounded-md border-2 border-black h-max text-xs text-center pl-2">
+                <select
+                  className="bg-white rounded-md border-2 border-black h-max text-xs text-center pl-2"
+                  value={perPage}
+                  onChange={(e) => setPerPage(parseInt(e.target.value))}
+                >
                   <option value="10">10</option>
                   <option value="20">20</option>
                   <option value="50">50</option>
@@ -69,8 +156,15 @@ const ManageLive = () => {
               </div>
             </div>
           </div>
-          <h3 className="text-xl m-3">ALL MATCHES</h3>
-          <MatchList isGrid={isGrid} />
+          <h3 className="text-xl m-3 font-semibold">ALL MATCHES</h3>
+          {loading ? (
+            <div className="mt-3">
+              <LoadingBall />
+            </div>
+          ) : (
+            //<div>hi</div>
+            <MatchList isGrid={isGrid} matchesArray={matches} />
+          )}
         </div>
       </Portal>
     </>
