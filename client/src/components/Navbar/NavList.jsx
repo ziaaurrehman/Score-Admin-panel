@@ -46,11 +46,11 @@ const NavList = () => {
       icon: <IoTrophySharp />,
       path: "/selected-leagues",
     },
-    {
-      name: "Highlights",
-      icon: <BsCameraReelsFill />,
-      path: "/highlights",
-    },
+    // {
+    //   name: "Highlights",
+    //   icon: <BsCameraReelsFill />,
+    //   path: "/highlights",
+    // },
     {
       name: "News",
       icon: <FaNewspaper />,
