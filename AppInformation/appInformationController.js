@@ -168,7 +168,7 @@ const getAppInformationSettings = async (req, res) => {
     const appSettings = await AppInformation.findOne();
     let baseURL = "http://localhost:5050";
     if (process.env.NODE_ENV === "PRODUCTION") {
-      baseURL = "https://score-admin-panel.onrender.com";
+      baseURL = "https://sportsdashboard.onrender.com";
     }
     if (appSettings) {
       // Create image url

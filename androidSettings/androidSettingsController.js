@@ -192,11 +192,12 @@ const getAndroidSettings = async (req, res) => {
 
     let baseURL = "http://localhost:5050";
     if (process.env.NODE_ENV === "PRODUCTION") {
-      baseURL = "https://score-admin-panel.onrender.com";
+      baseURL = "https://sportsdashboard.onrender.com";
     }
 
     if (androidSetting) {
       const imageURL = `${baseURL}/androidSettingupload/${androidSetting.required_app.logo}`;
+      console.log(imageURL);    
       androidSetting.required_app.logo = imageURL;
       res.status(200).json({
         message: "Android setting found",

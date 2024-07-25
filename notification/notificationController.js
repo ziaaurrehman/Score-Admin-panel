@@ -1,4 +1,5 @@
 import Notification from "./notificationModel.js";
+import NotificationHistory from "./notifHistory.js";
 import firebase from "../config/firebase.js";
 
 // Create Notifications
@@ -47,6 +48,22 @@ const getAllNotifications = async (req, res) => {
       status: true,
       message: "Notifications retrieved",
       data: notifications,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// Get Notification History
+
+const getNotificationHistory = async (req, res) => {
+  try {
+    const history = await NotificationHistory.find(); // Fetch history
+    res.status(200).json({
+      status: true,
+      message: "History retrieved",
+      data: history,
     });
   } catch (err) {
     console.log(err);
@@ -112,10 +129,18 @@ const sendToFirebase = async (message) => {
   // Setting topic and image variable
   const topic = "saad";
 
-  // Initliaze message function
+  const notif = {
+    title: message.title,
+    body: message.body,
+    image: message.image || "",
+  };
+
+  const notifHistory = new NotificationHistory(notif);
+
+  // Initialize message function
   const { messaging } = firebase;
 
-  // preparing notification message
+  // Preparing notification message
   let notification = {};
 
   if (message.image) {
@@ -126,6 +151,29 @@ const sendToFirebase = async (message) => {
         imageUrl: message.image,
       },
       topic: topic,
+      apns: {
+        headers: {
+          "apns-priority": "10",
+        },
+        payload: {
+          aps: {
+            alert: {
+              title: message.title,
+              body: message.body,
+            },
+            badge: 1,
+            sound: "default",
+          },
+        },
+      },
+      android: {
+        priority: "high",
+        notification: {
+          title: message.title,
+          body: message.body,
+          imageUrl: message.image,
+        },
+      },
     };
   } else {
     notification = {
@@ -134,9 +182,33 @@ const sendToFirebase = async (message) => {
         body: message.body,
       },
       topic: topic,
+      apns: {
+        headers: {
+          "apns-priority": "10",
+        },
+        payload: {
+          aps: {
+            alert: {
+              title: message.title,
+              body: message.body,
+            },
+            badge: 1,
+            sound: "default",
+          },
+        },
+      },
+      android: {
+        priority: "high",
+        notification: {
+          title: message.title,
+          body: message.body,
+        },
+      },
     };
   }
+
   // Send a message to devices subscribed to the provided topic.
+
   await messaging()
     .send(notification)
     .then((response) => {
@@ -145,6 +217,8 @@ const sendToFirebase = async (message) => {
     .catch((error) => {
       console.log("Error sending message:", error);
     });
+
+  await notifHistory.save();
 };
 
 export {
@@ -152,4 +226,5 @@ export {
   getAllNotifications,
   deleteNotification,
   sendNotification,
+  getNotificationHistory,
 };

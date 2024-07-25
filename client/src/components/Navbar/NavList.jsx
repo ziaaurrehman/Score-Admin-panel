@@ -24,37 +24,32 @@ const NavList = () => {
     {
       name: "Dashboard",
       icon: <MdSpaceDashboard />,
-      path: "/dashboard",
+      path: "/admin/dashboard",
     },
     {
       name: "Manage Live",
       icon: <MdLiveTv />,
-      path: "/manage-live",
+      path: "/admin/manage-live",
     },
     {
       name: "Fixtures",
       icon: <FaCalendarWeek />,
-      path: "/fixtures",
+      path: "/admin/fixtures",
     },
     {
       name: "Manage Apps",
       icon: <FaAppStoreIos />,
-      path: "/manage-apps",
+      path: "/admin/manage-apps",
     },
     {
       name: "Selected Leagues",
       icon: <IoTrophySharp />,
-      path: "/selected-leagues",
+      path: "/admin/selected-leagues",
     },
-    // {
-    //   name: "Highlights",
-    //   icon: <BsCameraReelsFill />,
-    //   path: "/highlights",
-    // },
     {
       name: "News",
       icon: <FaNewspaper />,
-      path: "/news",
+      path: "/admin/news",
     },
     // {
     //   name: "Contact Us",
@@ -64,7 +59,7 @@ const NavList = () => {
     {
       name: "Notifications",
       icon: <IoNotifications />,
-      path: "/notifications",
+      path: "/admin/notifications",
     },
     // {
     //   name: "Types",
@@ -91,7 +86,7 @@ const NavList = () => {
     {
       name: "Administration",
       icon: <IoSettings />,
-      path: "/administration",
+      path: "/admin/administration",
     },
     // {
     //   name: "Logout",

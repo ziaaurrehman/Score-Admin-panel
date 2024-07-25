@@ -2,16 +2,18 @@ import Sidebar from "../Navbar/Sidebar.jsx";
 import { GiHamburgerMenu } from "react-icons/gi";
 import User from "../Navbar/User.jsx";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiLogout } from "react-icons/ci";
 import LoadingBar from "react-top-loading-bar";
+import PropTypes from "prop-types";
 
 const Portal = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const navigation = useNavigate();
+  const location = useLocation();
 
   const handleOpen = () => {
     setOpen((prevState) => !prevState);
@@ -26,11 +28,16 @@ const Portal = ({ children }) => {
   };
 
   useEffect(() => {
-    getUser();
-  }, []);
+    const getUser = () => {
+      const value = JSON.parse(localStorage.getItem("user"));
+      if (value) {
+        setUser(value);
+      } else {
+        navigation("/admin");
+      }
+    };
 
-  // This displays the loading bar on the top of the screen when a route changes
-  useEffect(() => {
+    getUser();
     setLoading(true);
     const delay = setTimeout(() => {
       setLoading(false);
@@ -39,16 +46,21 @@ const Portal = ({ children }) => {
     return () => {
       clearTimeout(delay);
     };
-  }, [location.pathname]);
+  }, [navigation, location.pathname]);
 
-  const getUser = () => {
-    const value = JSON.parse(localStorage.getItem("user"));
-    if (value) {
-      setUser(value);
-    } else {
-      navigation("/");
-    }
-  };
+  // If user is null, don't render anything (since the user will be redirected)
+  if (user === null) {
+    return null; // Render nothing if the user is not set
+  }
+
+  // const getUser = () => {
+  //   const value = JSON.parse(localStorage.getItem("user"));
+  //   if (value) {
+  //     setUser(value);
+  //   } else {
+  //     navigation("/");
+  //   }
+  // };
 
   return (
     <div className="flex w-full">
@@ -78,11 +90,11 @@ const Portal = ({ children }) => {
                   </div>
                 </div>
                 <div className="relative" onClick={handleOpen}>
-                  <User name={"moiz khan"} imgSrc={user.img} />
+                  <User name={"john doe"} imgSrc={user.img} />
                   {open ? (
                     <Link
                       className="absolute right-0 p-2 bg-white rounded-md z-10 min-w-[100px] flex gap-2 items-center justify-center font-sm transition hover:text-red-600"
-                      to="/logout"
+                      to="/admin/logout"
                     >
                       <CiLogout className="text-xl" />
                       <p>Logout</p>
@@ -99,6 +111,10 @@ const Portal = ({ children }) => {
       ) : null}
     </div>
   );
+};
+
+Portal.propTypes = {
+  children: PropTypes.node,
 };
 
 export default Portal;

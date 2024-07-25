@@ -6,10 +6,12 @@ import { FaRegArrowAltCircleUp } from "react-icons/fa";
 import Portal from "../pages/Portal.jsx";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/dark.css";
+import moment from "moment-timezone";
 
 const EditMatch = () => {
   const location = useLocation();
   const [isClicked, setIsClicked] = useState(false);
+  const [localDate, setLocalDate] = useState("");
 
   const defaultPortraitWatermark = {
     top: 1.1,
@@ -54,6 +56,7 @@ const EditMatch = () => {
 
   useEffect(() => {
     getSingleMatch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const {
@@ -68,7 +71,6 @@ const EditMatch = () => {
     team_two,
     streaming_source,
   } = data;
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -128,22 +130,27 @@ const EditMatch = () => {
   const navigation = useNavigate();
 
   // set date handler
-  const handleDateChange = (date) => {
-    const selectedDateTime = new Date(date);
+  const handleDateChange = (selectedDates) => {
+    setLocalDate(selectedDates[0]);
+    if (selectedDates.length > 0) {
+      // Step 1: Parse the selected date in local time
+      const localDate = moment(selectedDates[0], "YYYY-MM-DD HH:mm A");
+      const localFormat = localDate.format();
 
-    // Format the date and time
-    const formattedDateTime = selectedDateTime.toLocaleString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true, // Include AM/PM indicator
-    });
-    setData({
-      ...data,
-      match_time: formattedDateTime,
-    });
+      // Step 2: Convert local date to Nepal timezone
+      // const nepalTime = localDate.clone().tz("Asia/Kathmandu");
+      // const formatted = nepalTime.format();
+      // console.log("Nepal Time:", formatted);
+
+      // // Step 3: Convert Nepal Time to ISO string in UTC
+      // const nepalTimeInUtcFormat = nepalTime.clone().utc().toISOString();
+      // console.log("Nepal Time in UTC Format:", nepalTimeInUtcFormat);
+      // Update state with the new match_time
+      setData((prevData) => ({
+        ...prevData,
+        match_time: localFormat,
+      }));
+    }
   };
 
   // scroll to top button
@@ -196,6 +203,7 @@ const EditMatch = () => {
       });
 
       setData(value);
+      setLocalDate(value.match_time);
     }
   };
 
@@ -206,7 +214,7 @@ const EditMatch = () => {
     try {
       const res = await updateMatch(id, data);
       if (res?.data?.success) {
-        navigation("/manage-live");
+        navigation("/admin/manage-live");
       }
       // console.log(res);
     } catch (error) {
@@ -315,7 +323,7 @@ const EditMatch = () => {
                       enableTime: true,
                       dateFormat: "Y-m-d h:i K",
                     }}
-                    value={match_time}
+                    value={localDate}
                     onChange={handleDateChange}
                   />
                 </div>

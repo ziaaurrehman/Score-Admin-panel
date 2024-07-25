@@ -65,7 +65,16 @@ app.use("/api", newsUpdateRoute);
 app.use("/api", newsRouter);
 app.use("/api/live", matchRouter);
 
-// Define routes for terms and conditions page
+// Define routes for static pages
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "static", "lander.html"));
+});
+
+app.get("/app-ads.txt", (req, res) => {
+  res.sendFile(path.join(__dirname, "static", "app-ads.txt"));
+});
+
 app.get("/terms", (req, res) => {
   res.sendFile(path.join(__dirname, "static", "terms.html"));
 });
@@ -75,10 +84,15 @@ app.get("/privacy", (req, res) => {
   res.sendFile(path.join(__dirname, "static", "privacy.html"));
 });
 
+// Define routes for contact-us page
+app.get("/contact", (req, res) => {
+  res.sendFile(path.join(__dirname, "static", "contact-us.html"));
+});
+
 if (process.env.NODE_ENV === "PRODUCTION") {
   app.use(express.static(path.join(__dirname, "./client/dist")));
 
-  app.get("*", (req, res) =>
+  app.get("/admin/*", (req, res) =>
     res.sendFile(path.resolve(__dirname, "./client/dist/index.html"))
   );
 } else {

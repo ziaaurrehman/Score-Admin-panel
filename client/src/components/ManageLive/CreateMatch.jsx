@@ -7,11 +7,10 @@ import Portal from "../pages/Portal.jsx";
 import { toast } from "react-toastify";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/dark.css";
+import moment from "moment-timezone";
 
 const CreateMatch = () => {
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-
   const defaultPortraitWatermark = {
     top: 1.1,
     bottom: null,
@@ -22,6 +21,7 @@ const CreateMatch = () => {
     image: "http://windfootball.com/logo/logo1.png",
   };
 
+  const [localDate, setLocalDate] = useState("");
   const [data, setData] = useState({
     sport_type: "",
     league_type: "",
@@ -56,33 +56,36 @@ const CreateMatch = () => {
 
   // Populate values of search params if they exist
   useEffect(() => {
-    const id = searchParams.get("id");
-    const date = searchParams.get("date");
-    const homeName = searchParams.get("homeName");
-    const homeLogo = searchParams.get("homeLogo");
-    const awayName = searchParams.get("awayName");
-    const awayLogo = searchParams.get("awayLogo");
-    const matchTitle = searchParams.get("matchTitle");
-    const sports = searchParams.get("sports");
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams) {
+      const id = searchParams.get("id");
+      const date = searchParams.get("date");
+      const homeName = searchParams.get("homeName");
+      const homeLogo = searchParams.get("homeLogo");
+      const awayName = searchParams.get("awayName");
+      const awayLogo = searchParams.get("awayLogo");
+      const matchTitle = searchParams.get("matchTitle");
+      const sports = searchParams.get("sports");
 
-    setData((prevData) => ({
-      ...prevData,
-      sport_type: sports || prevData.sport_type,
-      match_title: matchTitle || prevData.match_title,
-      match_time: date || prevData.match_time,
-      fixture_id: id || prevData.fixture_id,
-      team_one: {
-        ...prevData.team_one,
-        name: homeName || prevData.team_one.name,
-        image: homeLogo || prevData.team_one.image,
-      },
-      team_two: {
-        ...prevData.team_two,
-        name: awayName || prevData.team_two.name,
-        image: awayLogo || prevData.team_two.image,
-      },
-    }));
-  }, []);
+      setData((prevData) => ({
+        ...prevData,
+        sport_type: sports || prevData.sport_type,
+        match_title: matchTitle || prevData.match_title,
+        match_time: date || prevData.match_time,
+        fixture_id: id || prevData.fixture_id,
+        team_one: {
+          ...prevData.team_one,
+          name: homeName || prevData.team_one.name,
+          image: homeLogo || prevData.team_one.image,
+        },
+        team_two: {
+          ...prevData.team_two,
+          name: awayName || prevData.team_two.name,
+          image: awayLogo || prevData.team_two.image,
+        },
+      }));
+    }
+  }, [location.search]);
 
   const {
     sport_type,
@@ -120,22 +123,18 @@ const CreateMatch = () => {
   const navigation = useNavigate();
 
   // set date handler
-  const handleDateChange = (date) => {
-    const selectedDateTime = new Date(date);
+  const handleDateChange = (selectedDates) => {
+    setLocalDate(selectedDates[0]);
+    if (selectedDates.length > 0) {
+      // Convert selected date to Nepal timezone (UTC+05:45)
+      const localDate = moment(selectedDates[0], "YYYY-MM-DD HH:mm A");
+      const localFormat = localDate.format();
 
-    // Format the date and time
-    const formattedDateTime = selectedDateTime.toLocaleString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true, // Include AM/PM indicator
-    });
-    setData({
-      ...data,
-      match_time: formattedDateTime,
-    });
+      setData((prevData) => ({
+        ...prevData,
+        match_time: localFormat,
+      }));
+    }
   };
 
   // scroll to top button
@@ -195,7 +194,7 @@ const CreateMatch = () => {
           progress: undefined,
           theme: "light",
         });
-        navigation("/manage-live");
+        navigation("/admin/manage-live");
       }
     } catch (error) {
       console.log(error?.message);
@@ -304,7 +303,7 @@ const CreateMatch = () => {
                       enableTime: true,
                       dateFormat: "Y-m-d h:i K",
                     }}
-                    value={data.match_time}
+                    value={localDate}
                     onChange={handleDateChange}
                   />
                 </div>
