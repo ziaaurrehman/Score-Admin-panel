@@ -34,11 +34,13 @@ const MatchList = ({ isGrid, matchesArray }) => {
     const fetchData = async () => {
       try {
         const res = await myOrder();
+        console.log(res);
         if (!res) {
           const orderValues = matchesArray.map((item) => item.order);
           const req = updateMatchOrder(orderValues);
           console.log(req.status);
           setMatches(matchesArray);
+          console.log(orderValues);
         } else {
           const arrangedMatches = sortObjectsByOrder(matchesArray.slice(), res);
           setMatches(arrangedMatches);
@@ -55,6 +57,8 @@ const MatchList = ({ isGrid, matchesArray }) => {
 
   // Arranging items
   function sortObjectsByOrder(arrayOfObjects, orderArray) {
+    console.log("AOB: ", arrayOfObjects);
+    console.log("OR: ", orderArray);
     // Create a Set to store unique order values from the arrayOfObjects
     const uniqueOrders = new Set(arrayOfObjects.map((obj) => obj.order));
 
