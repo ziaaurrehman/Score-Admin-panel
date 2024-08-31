@@ -11,7 +11,7 @@ const androidSettingRouter = express.Router();
 androidSettingRouter.post(
   "/set-android-setting",
   upload.single("filename"),
-  authMiddleware,
+
   createAndUpdateAndroid
 );
 androidSettingRouter.get("/get-android-setting", getAndroidSettings);

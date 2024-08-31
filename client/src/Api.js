@@ -412,6 +412,9 @@ export const getAppInformation = async () => {
 // *********** ANDROID SECTION ************ //
 export const androidCreateUpdateSettings = async (data) => {
   try {
+    // const obj1 = {};
+    // data.forEach((value, key) => obj1[key] = value);
+    //console.log(JSON.stringify(obj1, null, 2));
     const res = await axios.post(
       `/manage-app/android/set-android-setting`,
       data,

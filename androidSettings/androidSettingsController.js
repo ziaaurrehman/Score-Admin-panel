@@ -65,123 +65,78 @@ const createAndUpdateAndroid = async (req, res) => {
     app_name,
     description,
   } = req.body;
-  const filename = req?.file?.filename || "";
 
-  const android = await AndroidSetting.findOne();
-  if (android) {
-    if (
-      (android_privacy_policy ||
-        android_terms_conditions ||
-        android_app_share_link ||
-        android_default_page ||
-        ios_app_share_link ||
-        ios_default_page ||
-        required_enable_app ||
-        notification_type ||
-        firebase_server_key ||
-        firebase_topic ||
-        required_enable_app,
-      application_id || app_url || app_name || description || filename)
-    ) {
-      try {
-        if (android?.image?.length && filename?.length) {
-          removeImage(android?.image);
-        }
+  //console.log('Body Backend: ', req.body);
+  const filename = req.file ? req.file.filename : null;
 
-        android.general_settings = {
-          android_privacy_policy:
-            android_privacy_policy ||
-            android.general_settings.android_privacy_policy,
-          android_terms_conditions:
-            android_terms_conditions ||
-            android.general_settings.android_terms_conditions,
-          android_app_share_link:
-            android_app_share_link ||
-            android.general_settings.android_app_share_link,
-          android_default_page:
-            android_default_page ||
-            android.general_settings.android_default_page,
-          ios_app_share_link:
-            ios_app_share_link || android.general_settings.ios_app_share_link,
-          ios_default_page:
-            ios_default_page || android.general_settings.ios_default_page,
-          notification_type:
-            notification_type || android.general_settings.notification_type,
-          firebase_server_key:
-            firebase_server_key || android.general_settings.firebase_server_key,
-          firebase_topic:
-            firebase_topic || android.general_settings.firebase_topic,
-        };
-        android.required_app = {
-          required_enable_app:
-            required_enable_app || android.required_app.required_enable_app,
-          application_id: application_id || android.required_app.application_id,
-          app_url: app_url || android.required_app.app_url,
-          app_name: app_name || android.required_app.app_name,
-          description: description || android.required_app.description,
-          logo: filename || android.required_app.logo,
-        };
-        const android_setting = await android.save();
-        res.status(200).json({
-          success: true,
-          message: "Updated Settings successfully.",
-          android_setting,
-        });
-      } catch (error) {
-        console.log(error, "error");
-        res.status(400).json({
-          success: false,
-          message: `${error?.message}`,
-        });
+  try {
+    let android = await AndroidSetting.findOne();
+
+    if (android) {
+      // Update existing settings
+      android.general_settings = {
+        android_privacy_policy: android_privacy_policy || android.general_settings.android_privacy_policy,
+        android_terms_conditions: android_terms_conditions || android.general_settings.android_terms_conditions,
+        android_app_share_link: android_app_share_link || android.general_settings.android_app_share_link,
+        android_default_page: android_default_page || android.general_settings.android_default_page,
+        ios_app_share_link: ios_app_share_link || android.general_settings.ios_app_share_link,
+        ios_default_page: ios_default_page || android.general_settings.ios_default_page,
+        notification_type: notification_type || android.general_settings.notification_type,
+        firebase_server_key: firebase_server_key || android.general_settings.firebase_server_key,
+        firebase_topic: firebase_topic || android.general_settings.firebase_topic,
+      };
+
+      android.required_app = {
+        required_enable_app: required_enable_app || android.required_app.required_enable_app,
+        application_id: application_id || android.required_app.application_id,
+        app_url: app_url || android.required_app.app_url,
+        app_name: app_name || android.required_app.app_name,
+        description: description || android.required_app.description,
+        logo: filename || android.required_app.logo,
+      };
+
+      if (filename && android.required_app.logo && android.required_app.logo !== filename) {
+        removeImage(android.required_app.logo);
       }
+
     } else {
-      res.status(400).json({
-        success: false,
-        message: "Something went wrong",
-      });
-    }
-  }
-  // If no settings found, then create settings
-  else if (!android) {
-    try {
-      const newAndroid = new AndroidSetting({
+      // Create new settings
+      android = new AndroidSetting({
         general_settings: {
-          android_privacy_policy: android_privacy_policy,
-          android_terms_conditions: android_terms_conditions,
-          android_app_share_link: android_app_share_link,
-          android_default_page: android_default_page,
-          ios_app_share_link: ios_app_share_link,
-          ios_default_page: ios_default_page,
-          notification_type: notification_type,
-          firebase_server_key: firebase_server_key,
-          firebase_topic: firebase_topic,
+          android_privacy_policy,
+          android_terms_conditions,
+          android_app_share_link,
+          android_default_page,
+          ios_app_share_link,
+          ios_default_page,
+          notification_type,
+          firebase_server_key,
+          firebase_topic,
         },
         required_app: {
-          required_enable_app: required_enable_app,
-          application_id: application_id,
-          app_url: app_url,
-          app_name: app_name,
-          description: description,
+          required_enable_app,
+          application_id,
+          app_url,
+          app_name,
+          description,
           logo: filename,
         },
       });
-      await newAndroid.save();
-
-      res.status(200).json({
-        success: true,
-        message: "Settings Created successfully",
-      });
-    } catch (error) {
-      console.log(error, "error");
-      res.status(400).json({
-        success: false,
-        message: `${error?.message}`,
-      });
     }
-  } else {
+
+    const savedAndroid = await android.save();
+
+    res.status(200).json({
+      success: true,
+      message: android.isNew ? "Settings Created successfully" : "Updated Settings successfully.",
+      android_setting: savedAndroid,
+    });
+
+  } catch (error) {
+    console.error('Error in createAndUpdateAndroid:', error);
     res.status(400).json({
       success: false,
-      message: "App Information not found",
+      message: error.message || "An error occurred while processing your request.",
     });
   }
 };
@@ -197,7 +152,7 @@ const getAndroidSettings = async (req, res) => {
 
     if (androidSetting) {
       const imageURL = `${baseURL}/androidSettingupload/${androidSetting.required_app.logo}`;
-      console.log(imageURL);    
+      console.log(imageURL);
       androidSetting.required_app.logo = imageURL;
       res.status(200).json({
         message: "Android setting found",

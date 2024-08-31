@@ -123,7 +123,7 @@ const AndroidSettings = () => {
   const handleFormData = (values) => {
     var formData = new FormData();
     formData.append("android_privacy_policy", values?.android_privacy_policy);
-    formData.append("filename", file);
+    formData.append("filename", file || null);
     formData.append(
       "android_terms_conditions",
       values?.android_terms_conditions
@@ -135,11 +135,11 @@ const AndroidSettings = () => {
     formData.append("notification_type", values?.notification_type);
     formData.append("firebase_server_key", values?.firebase_server_key);
     formData.append("firebase_topic", values?.firebase_topic);
-    formData.append("required_enable_app", values?.required_enable_app);
-    formData.append("application_id", values?.application_id);
-    formData.append("app_url", values?.app_url);
-    formData.append("app_name", values?.app_name);
-    formData.append("description", values?.description);
+    // formData.append("required_enable_app", values?.required_enable_app);
+    // formData.append("application_id", values?.application_id);
+    // formData.append("app_url", values?.app_url);
+    // formData.append("app_name", values?.app_name);
+    // formData.append("description", values?.description);
 
     return formData;
   };
@@ -158,9 +158,8 @@ const AndroidSettings = () => {
   };
   return (
     <div
-      className={`w-full rounded-md bg-gray-300 p-2 ${
-        loading ? "pointer-events-none" : ""
-      }`}
+      className={`w-full rounded-md bg-gray-300 p-2 ${loading ? "pointer-events-none" : ""
+        }`}
     >
       {loading ? (
         <LoadingSemiCircle />
@@ -404,9 +403,8 @@ const AndroidSettings = () => {
                 className="w-full bg-white rounded-md p-2 flex flex-col gap-2"
               >
                 <div
-                  className={`w-full flex justify-center transition-all items-center border-2 border-dashed border-gray-400 rounded-md ${
-                    dragging ? "bg-blue-400" : "bg-blue-200"
-                  }`}
+                  className={`w-full flex justify-center transition-all items-center border-2 border-dashed border-gray-400 rounded-md ${dragging ? "bg-blue-400" : "bg-blue-200"
+                    }`}
                   onDragEnter={handleDragEnter}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -440,9 +438,8 @@ const AndroidSettings = () => {
           </div>
           <div className="flex justify-end">
             <button
-              className={`text-sm my-4 font-semibold right-12 bottom-5  py-2 px-4 text-white uppercase hover:bg-blue-800 transition active:scale-95 rounded-md shadow-lg ${
-                loading ? "bg-gray-600" : "bg-blue-600"
-              }`}
+              className={`text-sm my-4 font-semibold right-12 bottom-5  py-2 px-4 text-white uppercase hover:bg-blue-800 transition active:scale-95 rounded-md shadow-lg ${loading ? "bg-gray-600" : "bg-blue-600"
+                }`}
               onClick={(e) => handleSave(e)}
             >
               Save
