@@ -6,11 +6,11 @@ const RapidAPiIKey = "d0e757645b65635c612f5dad12525aed";
 const getRapidRequest = (country) => {
   const rapidApi = {
     method: "GET",
-    url: "https://api-football-v1.p.rapidapi.com/v3/leagues",
+    url: "https://v3.football.api-sports.io/leagues",
     params: { country: country },
     headers: {
-      "x-rapidapi-key": RapidAPiIKey,
-      "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com/v3/leagues",
+      "x-apisports-key": RapidAPiIKey, // Use API-Sports key header
+      "x-rapidapi-host": "v3.football.api-sports.io", // API-Sports host
     },
   };
   return rapidApi;
@@ -40,11 +40,11 @@ const getFixturesRequest = (date) => {
   ) {
     const options = {
       method: "GET",
-      url: "https://api-football-v1.p.rapidapi.com/v3/fixtures",
+      url: "https://v3.football.api-sports.io/fixtures",
       params: { date: date },
       headers: {
-        "x-rapidapi-key": RapidAPiIKey,
-        "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com",
+        "x-apisports-key": RapidAPiIKey, // Use API-Sports key header
+        "x-rapidapi-host": "v3.football.api-sports.io", // API-Sports host
       },
     };
     return options;
