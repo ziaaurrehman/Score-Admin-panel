@@ -385,7 +385,7 @@ const generateThumbnail = async (req, res) => {
     const vsImage = await loadImage(`data:image/png;base64,${vsImageBase64}`);
 
     // Draw the VS image on the canvas
-    ctx.drawImage(vsImage, 200, 120, 50, 30); // Adjust the position and size as needed
+    ctx.drawImage(vsImage, 200, 120, 80, 70); // Adjust the position and size as needed
 
     // Add the time below everything, centered
     ctx.font = 'bold 18px Arial';
