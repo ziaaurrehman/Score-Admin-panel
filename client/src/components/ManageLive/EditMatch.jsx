@@ -10,6 +10,7 @@ import moment from "moment-timezone";
 
 const EditMatch = () => {
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [localDate, setLocalDate] = useState("");
 
@@ -55,7 +56,15 @@ const EditMatch = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    getSingleMatch();
+    try {
+      setLoading(true);
+      getSingleMatch();
+    } catch (err) {
+      setLoading(false);
+      console.error("Error: ", err);
+    } finally {
+      setLoading(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -209,15 +218,18 @@ const EditMatch = () => {
 
   // submits the form to the api
   const handleSubmit = async (e) => {
+    setLoading(true);
     setIsClicked(true);
     e.preventDefault();
     try {
       const res = await updateMatch(id, data);
       if (res?.data?.success) {
+        setLoading(false);
         navigation("/admin/manage-live");
       }
       // console.log(res);
     } catch (error) {
+      setLoading(false);
       console.error("Error creating match:", error);
     }
   };
@@ -681,7 +693,9 @@ const EditMatch = () => {
           <button
             onClick={handleSubmit}
             disabled={isClicked}
-            className="absolute text-sm font-semibold right-12 bottom-[60px] bg-blue-600 py-2 px-4 text-white uppercase animate-bounce hover:bg-blue-800 transition active:scale-95 rounded-md shadow-lg"
+            className={`absolute text-sm font-semibold right-12 bottom-[60px]  py-2 px-4 text-white uppercase animate-bounce transition active:scale-95 rounded-md shadow-lg ${
+              loading ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-800"
+            }`}
           >
             Update Match
           </button>
