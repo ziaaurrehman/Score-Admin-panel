@@ -7,11 +7,11 @@ import Portal from "../pages/Portal.jsx";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/dark.css";
 import moment from "moment-timezone";
+//import { getThumbnail } from "../../Api.js";
 
 const EditMatch = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
   const [localDate, setLocalDate] = useState("");
 
   const defaultPortraitWatermark = {
@@ -140,28 +140,15 @@ const EditMatch = () => {
 
   // set date handler
   const handleDateChange = (selectedDates) => {
-    setLocalDate(selectedDates[0]);
     if (selectedDates.length > 0) {
-      // Step 1: Parse the selected date in local time
-      const localDate = moment(selectedDates[0], "YYYY-MM-DD HH:mm A");
-      const localFormat = localDate.format();
-
-      // Step 2: Convert local date to Nepal timezone
-      // const nepalTime = localDate.clone().tz("Asia/Kathmandu");
-      // const formatted = nepalTime.format();
-      // console.log("Nepal Time:", formatted);
-
-      // // Step 3: Convert Nepal Time to ISO string in UTC
-      // const nepalTimeInUtcFormat = nepalTime.clone().utc().toISOString();
-      // console.log("Nepal Time in UTC Format:", nepalTimeInUtcFormat);
-      // Update state with the new match_time
+      const utcDate = moment(selectedDates[0]).utc();
+      setLocalDate(utcDate.toDate());
       setData((prevData) => ({
         ...prevData,
-        match_time: localFormat,
+        match_time: utcDate.toISOString(),
       }));
     }
   };
-
   // scroll to top button
   const scrollToTop = () => {
     window.scrollTo({
@@ -219,14 +206,14 @@ const EditMatch = () => {
   // submits the form to the api
   const handleSubmit = async (e) => {
     setLoading(true);
-    setIsClicked(true);
     e.preventDefault();
     try {
       const res = await updateMatch(id, data);
       if (res?.data?.success) {
-        setLoading(false);
         navigation("/admin/manage-live");
       }
+      setLoading(false);
+
       // console.log(res);
     } catch (error) {
       setLoading(false);
@@ -279,6 +266,7 @@ const EditMatch = () => {
                     >
                       <option value="">Select a League</option>
                       <option value="la-liga">La Liga</option>
+                      <option value="international">International</option>
                       <option value="bundesliga">Bundesliga</option>
                       <option value="ligue-1">Ligue 1</option>
                       <option value="serie-a">Serie A</option>
@@ -333,11 +321,19 @@ const EditMatch = () => {
                     className="border-2 border-gray-300 cursor-pointer w-full rounded-md p-1 text-black"
                     options={{
                       enableTime: true,
-                      dateFormat: "Y-m-d h:i K",
+                      dateFormat: "Z",
+                      time_24hr: true,
+                      utc: true,
                     }}
                     value={localDate}
                     onChange={handleDateChange}
                   />
+                  {localDate && (
+                    <p className="text-xs mt-1">
+                      Selected UTC time:{" "}
+                      {moment.utc(localDate).format("YYYY-MM-DD HH:mm")} UTC
+                    </p>
+                  )}
                 </div>
 
                 <div className="p-2 w-[33.3%]">
@@ -692,8 +688,8 @@ const EditMatch = () => {
 
           <button
             onClick={handleSubmit}
-            disabled={isClicked}
-            className={`absolute text-sm font-semibold right-12 bottom-[60px]  py-2 px-4 text-white uppercase animate-bounce transition active:scale-95 rounded-md shadow-lg ${
+            disabled={loading}
+            className={`absolute text-sm font-semibold right-12 bottom-[60px] py-2 px-4 text-white uppercase animate-bounce transition active:scale-95 rounded-md shadow-lg ${
               loading ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-800"
             }`}
           >

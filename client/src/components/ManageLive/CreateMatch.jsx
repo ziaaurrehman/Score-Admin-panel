@@ -75,6 +75,7 @@ const CreateMatch = () => {
         sport_type: sports || prevData.sport_type,
         match_title: matchTitle || prevData.match_title,
         match_time: date || prevData.match_time,
+        league_type: "international",
         fixture_id: id || prevData.fixture_id,
         team_one: {
           ...prevData.team_one,
@@ -128,18 +129,17 @@ const CreateMatch = () => {
 
   // set date handler
   const handleDateChange = (selectedDates) => {
-    setLocalDate(selectedDates[0]);
     if (selectedDates.length > 0) {
-      // Convert selected date to Nepal timezone (UTC+05:45)
-      const localDate = moment(selectedDates[0], "YYYY-MM-DD HH:mm A");
-      const localFormat = localDate.format();
-
+      const utcDate = moment(selectedDates[0]).utc();
+      setLocalDate(utcDate.toDate());
       setData((prevData) => ({
         ...prevData,
-        match_time: localFormat,
+        match_time: utcDate.toISOString(),
       }));
     }
   };
+
+  // ... (keep other functions)
 
   // scroll to top button
   const scrollToTop = () => {
@@ -184,6 +184,10 @@ const CreateMatch = () => {
     });
   };
 
+  const formatTime = (time) => {
+    return moment.utc(time).format("YYYY-MM-DD HH:mm:ss [UTC]");
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -192,12 +196,7 @@ const CreateMatch = () => {
         name1: data.team_one.name,
         logo2: data.team_two.image,
         name2: data.team_two.name,
-        time: new Date(data.match_time).toLocaleString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: true,
-        }),
+        time: formatTime(data.match_time),
       };
 
       const thumbnail = await getThumbnail(thumbdata);
@@ -215,9 +214,9 @@ const CreateMatch = () => {
           progress: undefined,
           theme: "light",
         });
-        setLoading(false);
         navigation("/admin/manage-live");
       }
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       console.log(error?.message);
@@ -269,6 +268,7 @@ const CreateMatch = () => {
                       onChange={handleChange}
                     >
                       <option value="">Select a League</option>
+                      <option value="international">International</option>
                       <option value="la-liga">La Liga</option>
                       <option value="bundesliga">Bundesliga</option>
                       <option value="ligue-1">Ligue 1</option>
@@ -324,11 +324,19 @@ const CreateMatch = () => {
                     className="border-2 border-gray-300 cursor-pointer w-full rounded-md p-1 text-black"
                     options={{
                       enableTime: true,
-                      dateFormat: "Y-m-d h:i K",
+                      dateFormat: "Z",
+                      time_24hr: true,
+                      utc: true,
                     }}
                     value={localDate}
                     onChange={handleDateChange}
                   />
+                  {localDate && (
+                    <p className="text-xs mt-1">
+                      Selected UTC time:{" "}
+                      {moment.utc(localDate).format("YYYY-MM-DD HH:mm")} UTC
+                    </p>
+                  )}
                 </div>
 
                 <div className="p-2 w-[33.3%]">
