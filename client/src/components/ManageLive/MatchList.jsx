@@ -34,15 +34,24 @@ const MatchList = ({ isGrid, matchesArray }) => {
     const fetchData = async () => {
       try {
         const res = await myOrder();
-        console.log(res);
+        let order = res;
+        if (res.length !== matchesArray.length) {
+          const orderValues = matchesArray.map((item) => item.order);
+          await updateMatchOrder(orderValues);
+          order = orderValues;
+        }
         if (!res) {
           const orderValues = matchesArray.map((item) => item.order);
-          const req = updateMatchOrder(orderValues);
-          console.log(req.status);
+          await updateMatchOrder(orderValues);
+          order = orderValues;
+          //console.log(req.status);
           setMatches(matchesArray);
-          console.log(orderValues);
+          //console.log(orderValues);
         } else {
-          const arrangedMatches = sortObjectsByOrder(matchesArray.slice(), res);
+          const arrangedMatches = sortObjectsByOrder(
+            matchesArray.slice(),
+            order
+          );
           setMatches(arrangedMatches);
         }
       } catch (err) {
