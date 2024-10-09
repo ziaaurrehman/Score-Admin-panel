@@ -136,6 +136,44 @@ const getMatchById = async (req, res) => {
   }
 };
 
+// Get paginated matches for mobile
+const getMobileMatches = async (req, res) => {
+  // Fixed number of items per page for mobile
+  const perPage = 10;
+  const page = parseInt(req.query.page) || 1;
+  const searchQuery = req.query.search || "";
+
+  try {
+    const view = await MobileView.findOne();
+    let query = {};
+    if (searchQuery) {
+      query.league_type = { $regex: searchQuery, $options: "i" };
+    }
+
+    // Count the total number of matches based on the query
+    const totalCount = await Matches.countDocuments(query);
+
+    // Fetch the paginated matches based on the query, sorting by league_type
+    const matches = await Matches.find(query)
+      .sort({ league_type: 1 })
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+
+    const hasMore = totalCount > page * perPage;
+
+    res.status(200).json({
+      success: true,
+      message: "Mobile Matches",
+      mobile_view: view.mobile_view,
+      matches,
+      hasMore,
+      currentPage: page,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Update a match
 const updateMatch = async (req, res) => {
   const { id } = req.params;
@@ -457,4 +495,5 @@ export {
   updateNumbersArray,
   getMatchOrder,
   generateThumbnail,
+  getMobileMatches,
 };
