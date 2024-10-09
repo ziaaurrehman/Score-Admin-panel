@@ -239,6 +239,9 @@ const duplicateMatchById = async (req, res) => {
       });
     }
 
+    const maxOrderMatch = await Matches.findOne().sort({ order: -1 }).limit(1);
+    const newOrder = maxOrderMatch ? maxOrderMatch.order + 1 : 1;
+
     const newMatch = new Matches({
       sport_type: originalMatch.sport_type,
       league_type: originalMatch.league_type,
@@ -249,6 +252,7 @@ const duplicateMatchById = async (req, res) => {
       hot_match: originalMatch.hot_match,
       team_one: originalMatch.team_one,
       team_two: originalMatch.team_two,
+      order: newOrder,
       streaming_source: originalMatch.streaming_source,
       thumbnail: originalMatch.thumbnail,
     });

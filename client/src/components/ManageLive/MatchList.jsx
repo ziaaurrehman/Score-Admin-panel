@@ -57,8 +57,8 @@ const MatchList = ({ isGrid, matchesArray }) => {
 
   // Arranging items
   function sortObjectsByOrder(arrayOfObjects, orderArray) {
-    console.log("AOB: ", arrayOfObjects);
-    console.log("OR: ", orderArray);
+    //console.log("AOB: ", arrayOfObjects);
+    //console.log("OR: ", orderArray);
     // Create a Set to store unique order values from the arrayOfObjects
     const uniqueOrders = new Set(arrayOfObjects.map((obj) => obj.order));
 
